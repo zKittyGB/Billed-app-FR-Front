@@ -14,7 +14,12 @@ export default class NewBill {
     this.fileName = null
     this.billId = null
     new Logout({ document, localStorage, onNavigate })
+    //force l'utilisateur à rentrer un fichier au format png jpg ou jpeg
+    const inputFile = this.document.querySelector(`input[data-testid="file"]`)
+    inputFile.setAttribute("accept",".png, .jpg, .jpeg")
   }
+  
+
   handleChangeFile = e => {
     e.preventDefault()
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
@@ -24,7 +29,6 @@ export default class NewBill {
     const email = JSON.parse(localStorage.getItem("user")).email
     formData.append('file', file)
     formData.append('email', email)
-
     this.store
       .bills()
       .create({
