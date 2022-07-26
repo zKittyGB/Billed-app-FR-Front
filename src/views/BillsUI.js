@@ -18,13 +18,18 @@ const row = (bill) => {
     </tr>
     `)
   }
+  //fonction de tri
+  const antiChrono = (a, b) => {
+    return ((a.date < b.date) ? 1 : -1)
+  }
 
-const rows = (data) => {
-  return (data && data.length) ? data.map(bill => row(bill)).join("") : ""
+const rows = (data) => {  
+  //dataTemps si != "", apply .sort.  else : retourn chaine vide
+  let dataTemp = (data && data.length) ? data.sort(antiChrono) : ""
+  return (dataTemp) ? dataTemp.map(bill => row(bill)).join("") : ""
 }
 
 export default ({ data: bills, loading, error }) => {
-  
   const modal = () => (`
     <div class="modal fade" id="modaleFile" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered modal-lg" role="document">

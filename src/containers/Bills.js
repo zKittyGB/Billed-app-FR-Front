@@ -29,11 +29,12 @@ export default class {
 
   getBills = () => {
     if (this.store) {
-      console.log(this.store)
       return this.store
       .bills()
       .list()
       .then(snapshot => {
+        // const antiChrono = (a, b) => ((a.date < b.date) ? 1 : -1)
+        // snapshot.sort(antiChrono)
         const bills = snapshot
           .map(doc => {
             try {
