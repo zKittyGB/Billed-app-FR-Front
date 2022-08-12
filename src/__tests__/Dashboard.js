@@ -70,7 +70,7 @@ describe('Given I am connected as an Admin', () => {
 
       const icon1 = screen.getByTestId('arrow-icon1')
       const icon2 = screen.getByTestId('arrow-icon2')
-      const icon3 = screen.getByTestId('arrow-icon3')
+       const icon3 = screen.getByTestId('arrow-icon3')
 
       icon1.addEventListener('click', handleShowTickets1)
       userEvent.click(icon1)
@@ -91,6 +91,43 @@ describe('Given I am connected as an Admin', () => {
     })
   })
 
+  describe('When I am on Dashboard page and I click a second time on arrow', () => {
+    test('Then, tickets list should be fold, and cards should disappear',  () => {
+      const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname })
+      }
+      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+      window.localStorage.setItem('user', JSON.stringify({
+        type: 'Admin'
+      }))
+      const dashboard = new Dashboard({
+        document, onNavigate, store: null, bills:bills, localStorage: window.localStorage
+      })
+      document.body.innerHTML = DashboardUI({ data: { bills } })
+      const handleShowTickets1 = jest.fn((e) => dashboard.handleShowTickets(e, bills, 1))
+      const handleShowTickets2 = jest.fn((e) => dashboard.handleShowTickets(e, bills, 2))
+      const handleShowTickets3 = jest.fn((e) => dashboard.handleShowTickets(e, bills, 3))
+      const icon1 = screen.getByTestId('arrow-icon1')
+      const icon2 = screen.getByTestId('arrow-icon2')
+      const icon3 = screen.getByTestId('arrow-icon3')
+
+      icon1.addEventListener('click', handleShowTickets1)
+      userEvent.click(icon1)
+      userEvent.click(icon1)
+      const styleIcon1 = getComputedStyle(icon1)
+      expect(styleIcon1.transform).toBe("rotate(90deg)")
+      icon2.addEventListener('click', handleShowTickets2)
+      userEvent.click(icon2)
+      userEvent.click(icon2)
+      const styleIcon2 = getComputedStyle(icon1)
+      expect(styleIcon2.transform).toBe("rotate(90deg)")
+      icon3.addEventListener('click', handleShowTickets3)
+      userEvent.click(icon3)
+      userEvent.click(icon3)
+      const styleIcon3 = getComputedStyle(icon1)
+      expect(styleIcon3.transform).toBe("rotate(90deg)")
+    })
+  })
   describe('When I am on Dashboard page and I click on edit icon of a card', () => {
     test('Then, right form should be filled',  () => {
 
@@ -233,7 +270,6 @@ describe('Given I am connected as Admin and I am on Dashboard page and I clicked
       eye.addEventListener('click', handleClickIconEye)
       userEvent.click(eye)
       expect(handleClickIconEye).toHaveBeenCalled()
-
       const modale = screen.getByTestId('modaleFileAdmin')
       expect(modale).toBeTruthy()
     })

@@ -7,13 +7,14 @@ import BillsUI from "../views/BillsUI.js"
 import { bills } from "../fixtures/bills.js"
 import { ROUTES_PATH} from "../constants/routes.js";
 import {localStorageMock} from "../__mocks__/localStorage.js";
-
 import router from "../app/Router.js";
+import userEvent from "@testing-library/user-event";
+import Bills from "../containers/Bills.js"
+import store from "../__mocks__/store.js"
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
     test("Then bill icon in vertical layout should be highlighted", async () => {
-
       Object.defineProperty(window, 'localStorage', { value: localStorageMock })
       window.localStorage.setItem('user', JSON.stringify({
         type: 'Employee'
@@ -25,7 +26,8 @@ describe("Given I am connected as an employee", () => {
       window.onNavigate(ROUTES_PATH.Bills)
       await waitFor(() => screen.getByTestId('icon-window'))
       const windowIcon = screen.getByTestId('icon-window')
-      //to-do write expect expression
+      //verifier que la classe active sur l'element est "active-icon"
+      expect(windowIcon.className).toBe("active-icon")
     })
     test("Then bills should be ordered from earliest to latest", () => {
       document.body.innerHTML = BillsUI({ data: bills })
@@ -34,5 +36,65 @@ describe("Given I am connected as an employee", () => {
       const datesSorted = [...dates].sort(antiChrono)
       expect(dates).toEqual(datesSorted)
     })
+    //tester le fetch du GET
+    test("fetches bills from mock API GET", async () =>{
+      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+      window.localStorage.setItem('user', JSON.stringify({
+        type: 'Employee'
+      }))
+      const root = document.createElement("div")
+      root.setAttribute("id", "root")
+      document.body.append(root)
+      router()
+      window.onNavigate(ROUTES_PATH.Bills)
+      await waitFor(() => screen.getByText("Mes notes de frais"))
+      const btnNewBill = await screen.getByTestId('btn-new-bill')
+      expect(btnNewBill).toBeTruthy()
+      const tBody = await screen.getByTestId('tbody')
+      expect(tBody).toBeTruthy()
+    }) 
+    test("bills should be create",()=>{
+      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+      window.localStorage.setItem('user', JSON.stringify({
+        type: 'Employee'
+      }))
+      const root = document.createElement("div")
+      root.setAttribute("id", "root")
+      document.body.append(root)
+      router()
+      window.onNavigate(ROUTES_PATH.Bills)
+      store.bills = jest.fn().mockImplementationOnce(() => {
+        return {
+          list: jest.fn().mockResolvedValue([{ id: 1, data: () => ({ date: '' }) }])
+        }
+      })
+      const bills = new Bills({ document, onNavigate, store:store, localStorage:window.localStorage})
+      const res = bills.getBills()
+      expect(res).toEqual(Promise.resolve({}))
+    })
+    //Test du form newBill
+    describe(`When i click on "newBill"`,()=>{
+      test("show form newBill",async ()=>{
+      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+      window.localStorage.setItem('user', JSON.stringify({
+        type: 'Employee'
+      }))
+      const root = document.createElement("div")
+      root.setAttribute("id", "root")
+      document.body.append(root)
+      router()
+      window.onNavigate(ROUTES_PATH.Bills)
+      await waitFor(() => screen.getByText("Mes notes de frais"))
+      const btnNewBill = await screen.getByTestId('btn-new-bill')
+      const bills = new Bills({ document, onNavigate, store:null, localStorage:window.localStorage})
+      const handleClickNewBill = jest.fn((e) => bills.handleClickNewBill())
+      btnNewBill.addEventListener('click', handleClickNewBill)
+      userEvent.click(btnNewBill)
+      await waitFor(()=>screen.getByText("Envoyer une note de frais"))
+      const formNewBill = await screen.getByTestId('form-new-bill')
+      expect(formNewBill).toBeTruthy()
+      })
+    })
   })
 })
+
