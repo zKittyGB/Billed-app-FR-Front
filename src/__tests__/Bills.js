@@ -11,6 +11,7 @@ import router from "../app/Router.js";
 import userEvent from "@testing-library/user-event";
 import Bills from "../containers/Bills.js"
 import store from "../__mocks__/store.js"
+import '@testing-library/jest-dom/extend-expect'
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
@@ -29,6 +30,7 @@ describe("Given I am connected as an employee", () => {
       //verifier que la classe active sur l'element est "active-icon"
       expect(windowIcon.className).toBe("active-icon")
     })
+    //test du tri par ordre de création du plus récents aux plus anciens
     test("Then bills should be ordered from earliest to latest", () => {
       document.body.innerHTML = BillsUI({ data: bills })
       const dates = screen.getAllByText(/^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/i).map(a => a.innerHTML)
@@ -53,6 +55,7 @@ describe("Given I am connected as an employee", () => {
       const tBody = await screen.getByTestId('tbody')
       expect(tBody).toBeTruthy()
     }) 
+    //test de créations des bulletins
     test("bills should be create",()=>{
       Object.defineProperty(window, 'localStorage', { value: localStorageMock })
       window.localStorage.setItem('user', JSON.stringify({
@@ -65,16 +68,17 @@ describe("Given I am connected as an employee", () => {
       window.onNavigate(ROUTES_PATH.Bills)
       store.bills = jest.fn().mockImplementationOnce(() => {
         return {
-          list: jest.fn().mockResolvedValue([{ id: 1, data: () => ({ date: '' }) }])
+          list: jest.fn().mockResolvedValue([{  
+              date:"2021-11-02"
+          }])
         }
       })
       const bills = new Bills({ document, onNavigate, store:store, localStorage:window.localStorage})
       const res = bills.getBills()
       expect(res).toEqual(Promise.resolve({}))
     })
-    //Test du form newBill
-    describe(`When i click on "newBill"`,()=>{
-      test("show form newBill",async ()=>{
+    //test du catch invalid data time value
+    test("bills should send a data invalide value",()=>{
       Object.defineProperty(window, 'localStorage', { value: localStorageMock })
       window.localStorage.setItem('user', JSON.stringify({
         type: 'Employee'
@@ -84,15 +88,63 @@ describe("Given I am connected as an employee", () => {
       document.body.append(root)
       router()
       window.onNavigate(ROUTES_PATH.Bills)
-      await waitFor(() => screen.getByText("Mes notes de frais"))
-      const btnNewBill = await screen.getByTestId('btn-new-bill')
-      const bills = new Bills({ document, onNavigate, store:null, localStorage:window.localStorage})
-      const handleClickNewBill = jest.fn((e) => bills.handleClickNewBill())
-      btnNewBill.addEventListener('click', handleClickNewBill)
-      userEvent.click(btnNewBill)
-      await waitFor(()=>screen.getByText("Envoyer une note de frais"))
-      const formNewBill = await screen.getByTestId('form-new-bill')
-      expect(formNewBill).toBeTruthy()
+      store.bills = jest.fn().mockImplementationOnce(() => {
+        return {
+          list: jest.fn().mockResolvedValue([{  
+              date:""
+          }])
+        }
+      })
+      const bills = new Bills({ document, onNavigate, store:store, localStorage:window.localStorage})
+      const res = bills.getBills()
+      expect(res).toEqual(Promise.resolve({}))
+    })
+    //Test du form newBill
+    describe(`When i click on "newBill"`,()=>{
+      test("show form newBill",async ()=>{
+        Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+        window.localStorage.setItem('user', JSON.stringify({
+          type: 'Employee'
+        }))
+        const root = document.createElement("div")
+        root.setAttribute("id", "root")
+        document.body.append(root)
+        router()
+        window.onNavigate(ROUTES_PATH.Bills)
+        await waitFor(() => screen.getByText("Mes notes de frais"))
+        const btnNewBill = await screen.getByTestId('btn-new-bill')
+        const bills = new Bills({ document, onNavigate, store:null, localStorage:window.localStorage})
+        const handleClickNewBill = jest.fn((e) => bills.handleClickNewBill())
+        btnNewBill.addEventListener('click', handleClickNewBill)
+        userEvent.click(btnNewBill)
+        await waitFor(()=>screen.getByText("Envoyer une note de frais"))
+        const formNewBill = await screen.getByTestId('form-new-bill')
+        expect(formNewBill).toBeTruthy()
+      })
+    })
+    describe("When i click on HandleIconEye", ()=>{
+      test("modal should be show", async ()=>{
+        Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+        window.localStorage.setItem('user', JSON.stringify({
+          type: 'Employee'
+        }))
+        const root = document.createElement("div")
+        root.setAttribute("id", "root")
+        document.body.append(root)
+        router()
+        window.onNavigate(ROUTES_PATH.Bills)
+        await waitFor(() => screen.getByText("Mes notes de frais"))
+        const handleIconEye = await screen.getAllByTestId('icon-eye')
+        const modal = screen.getByRole('dialog', { hidden: true })
+
+        expect(handleIconEye[0]).toHaveAttribute('data-bill-url')
+        //const bills = new Bills({ document, onNavigate, store, localStorage:window.localStorage})
+        // const handleClickIconEye = jest.fn((e) => bills.handleClickIconEye(handleIconEye[1]))
+        // handleIconEye[1].addEventListener('click', handleClickIconEye)
+        //userEvent.click(handleIconEye[0])
+
+        //await waitFor(() => screen.getByText("Justificatif"))
+         
       })
     })
   })

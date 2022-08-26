@@ -11,7 +11,6 @@ describe("Given that I am a user on login page", () => {
   describe("When I do not fill fields and I click on employee button Login In", () => {
     test("Then It should renders Login page", () => {
       document.body.innerHTML = LoginUI();
-
       const inputEmailUser = screen.getByTestId("employee-email-input");
       expect(inputEmailUser.value).toBe("");
 
@@ -20,7 +19,6 @@ describe("Given that I am a user on login page", () => {
 
       const form = screen.getByTestId("form-employee");
       const handleSubmit = jest.fn((e) => e.preventDefault());
-
       form.addEventListener("submit", handleSubmit);
       fireEvent.submit(form);
       expect(screen.getByTestId("form-employee")).toBeTruthy();
@@ -30,7 +28,6 @@ describe("Given that I am a user on login page", () => {
   describe("When I do fill fields in incorrect format and I click on employee button Login In", () => {
     test("Then It should renders Login page", () => {
       document.body.innerHTML = LoginUI();
-
       const inputEmailUser = screen.getByTestId("employee-email-input");
       fireEvent.change(inputEmailUser, { target: { value: "pasunemail" } });
       expect(inputEmailUser.value).toBe("pasunemail");
@@ -41,7 +38,6 @@ describe("Given that I am a user on login page", () => {
 
       const form = screen.getByTestId("form-employee");
       const handleSubmit = jest.fn((e) => e.preventDefault());
-
       form.addEventListener("submit", handleSubmit);
       fireEvent.submit(form);
       expect(screen.getByTestId("form-employee")).toBeTruthy();
@@ -55,7 +51,6 @@ describe("Given that I am a user on login page", () => {
         email: "johndoe@email.com",
         password: "azerty",
       };
-
       const inputEmailUser = screen.getByTestId("employee-email-input");
       fireEvent.change(inputEmailUser, { target: { value: inputData.email } });
       expect(inputEmailUser.value).toBe(inputData.email);
@@ -67,7 +62,6 @@ describe("Given that I am a user on login page", () => {
       expect(inputPasswordUser.value).toBe(inputData.password);
 
       const form = screen.getByTestId("form-employee");
-
       // localStorage should be populated with form data
       Object.defineProperty(window, "localStorage", {
         value: {
@@ -76,16 +70,12 @@ describe("Given that I am a user on login page", () => {
         },
         writable: true,
       });
-
       // we have to mock navigation to test it
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname });
       };
-
       let PREVIOUS_LOCATION = "";
-
       const store = jest.fn();
-
       const login = new Login({
         document,
         localStorage: window.localStorage,
@@ -93,7 +83,6 @@ describe("Given that I am a user on login page", () => {
         PREVIOUS_LOCATION,
         store,
       });
-
       const handleSubmit = jest.fn(login.handleSubmitEmployee);
       login.login = jest.fn().mockResolvedValue({});
       form.addEventListener("submit", handleSubmit);
@@ -168,7 +157,6 @@ describe("Given that I am a user on login page", () => {
         password: "azerty",
         status: "connected",
       };
-
       const inputEmailUser = screen.getByTestId("admin-email-input");
       fireEvent.change(inputEmailUser, { target: { value: inputData.email } });
       expect(inputEmailUser.value).toBe(inputData.email);
@@ -178,9 +166,8 @@ describe("Given that I am a user on login page", () => {
         target: { value: inputData.password },
       });
       expect(inputPasswordUser.value).toBe(inputData.password);
-
+  
       const form = screen.getByTestId("form-admin");
-
       // localStorage should be populated with form data
       Object.defineProperty(window, "localStorage", {
         value: {
@@ -189,16 +176,12 @@ describe("Given that I am a user on login page", () => {
         },
         writable: true,
       });
-
       // we have to mock navigation to test it
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname });
       };
-
       let PREVIOUS_LOCATION = "";
-
       const store = jest.fn();
-
       const login = new Login({
         document,
         localStorage: window.localStorage,
@@ -206,7 +189,6 @@ describe("Given that I am a user on login page", () => {
         PREVIOUS_LOCATION,
         store,
       });
-
       const handleSubmit = jest.fn(login.handleSubmitAdmin);
       login.login = jest.fn().mockResolvedValue({});
       form.addEventListener("submit", handleSubmit);
@@ -223,26 +205,13 @@ describe("Given that I am a user on login page", () => {
         })
       );
     });
-
     test("It should renders HR dashboard page", () => {
       expect(screen.queryByText("Validations")).toBeTruthy();
     });
   });
 
-
-
-
-
-
-
-
-
-
-
-
-
-  describe("When I do fill fields in correct format and I click on admin button Login In", () => {
-    test("Then I should be identified as an HR admin in app", () => {
+  describe("When I do fill fields in correct format with bad identifiant and I click on admin button Login In", () => {
+    test("Then I should got an error", () => {
       document.body.innerHTML = LoginUI();
       const inputData = {
         type: "Admin",
@@ -250,17 +219,13 @@ describe("Given that I am a user on login page", () => {
         password: "azerty",
         status: "connected",
       };
-
       const inputEmailUser = screen.getByTestId("admin-email-input");
       fireEvent.change(inputEmailUser, { target: { value: "fail@test.tld" } });
-
       const inputPasswordUser = screen.getByTestId("admin-password-input");
       fireEvent.change(inputPasswordUser, {
         target: { value: "fail" },
       });
-
       const form = screen.getByTestId("form-admin");
-
       // localStorage should be populated with form data
       Object.defineProperty(window, "localStorage", {
         value: {
@@ -269,16 +234,12 @@ describe("Given that I am a user on login page", () => {
         },
         writable: true,
       });
-
       // we have to mock navigation to test it
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname });
       };
-
       let PREVIOUS_LOCATION = "";
-
       const store = jest.fn();
-
       const login = new Login({
         document,
         localStorage: window.localStorage,
@@ -286,18 +247,14 @@ describe("Given that I am a user on login page", () => {
         PREVIOUS_LOCATION,
         store,
       });
-
       const handleSubmit = jest.fn(login.handleSubmitAdmin);
       login.login = jest.fn().mockResolvedValue({});
       form.addEventListener("submit", handleSubmit);
       fireEvent.submit(form);
       // const logSpy = jest.spyOn(console, 'warn').mockImplementation(()=>{});
-      
 
       expect(handleSubmit).toHaveBeenCalled()
       expect(handleSubmit).toThrow(TypeError)
-      console.log("pouic",handleSubmit)
-      
     });
   }); 
 });
