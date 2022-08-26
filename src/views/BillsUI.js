@@ -24,7 +24,7 @@ const row = (bill) => {
   }
 
 const rows = (data) => {  
-  //dataTemps si != "", apply .sort.  else : retourn chaine vide
+  //Si dataTemps n'est pas null, lancer la fonction de tri, sinon, retourne chaine vide
   let dataTemp = (data && data.length) ? data.sort(antiChrono) : ""
   return (dataTemp) ? dataTemp.map(bill => row(bill)).join("") : ""
 }

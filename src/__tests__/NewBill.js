@@ -14,9 +14,9 @@ import store from "../__mocks__/store.js"
 
 Object.defineProperty(window, 'LocalStorage', {value: localStorageMock})
 window.localStorage.setItem('user', JSON.stringify({type: 'Employee'}))
-
 describe("Given I am connected as an employee", () => {
   describe("When I am on NewBill Page", () => {
+    //test du bon affichage du formulaire newbill
     test("Then the form is rendered",async () => {
       const html = NewBillUI()
       document.body.innerHTML = html
@@ -26,6 +26,7 @@ describe("Given I am connected as an employee", () => {
     })
   })
   describe("When I am on NewBill Page",()=>{
+    //test du bon format des fichiers joints
     test("Then, a file should be upload with a good format",()=>{
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname });

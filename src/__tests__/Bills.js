@@ -55,7 +55,7 @@ describe("Given I am connected as an employee", () => {
       const tBody = await screen.getByTestId('tbody')
       expect(tBody).toBeTruthy()
     }) 
-    //test de créations des bulletins
+    //test de la création des notes de frais existantes
     test("bills should be create",()=>{
       Object.defineProperty(window, 'localStorage', { value: localStorageMock })
       window.localStorage.setItem('user', JSON.stringify({
@@ -77,7 +77,7 @@ describe("Given I am connected as an employee", () => {
       const res = bills.getBills()
       expect(res).toEqual(Promise.resolve({}))
     })
-    //test du catch invalid data time value
+    //test de l'envoie d'un message d'erreur en cas de datatime erroné
     test("bills should send a data invalide value",()=>{
       Object.defineProperty(window, 'localStorage', { value: localStorageMock })
       window.localStorage.setItem('user', JSON.stringify({
@@ -99,7 +99,7 @@ describe("Given I am connected as an employee", () => {
       const res = bills.getBills()
       expect(res).toEqual(Promise.resolve({}))
     })
-    //Test du form newBill
+    //Test de l'ouverture du formulaire newbill
     describe(`When i click on "newBill"`,()=>{
       test("show form newBill",async ()=>{
         Object.defineProperty(window, 'localStorage', { value: localStorageMock })
@@ -120,31 +120,6 @@ describe("Given I am connected as an employee", () => {
         await waitFor(()=>screen.getByText("Envoyer une note de frais"))
         const formNewBill = await screen.getByTestId('form-new-bill')
         expect(formNewBill).toBeTruthy()
-      })
-    })
-    describe("When i click on HandleIconEye", ()=>{
-      test("modal should be show", async ()=>{
-        Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-        window.localStorage.setItem('user', JSON.stringify({
-          type: 'Employee'
-        }))
-        const root = document.createElement("div")
-        root.setAttribute("id", "root")
-        document.body.append(root)
-        router()
-        window.onNavigate(ROUTES_PATH.Bills)
-        await waitFor(() => screen.getByText("Mes notes de frais"))
-        const handleIconEye = await screen.getAllByTestId('icon-eye')
-        const modal = screen.getByRole('dialog', { hidden: true })
-
-        expect(handleIconEye[0]).toHaveAttribute('data-bill-url')
-        //const bills = new Bills({ document, onNavigate, store, localStorage:window.localStorage})
-        // const handleClickIconEye = jest.fn((e) => bills.handleClickIconEye(handleIconEye[1]))
-        // handleIconEye[1].addEventListener('click', handleClickIconEye)
-        //userEvent.click(handleIconEye[0])
-
-        //await waitFor(() => screen.getByText("Justificatif"))
-         
       })
     })
   })
